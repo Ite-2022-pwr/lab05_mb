@@ -35,7 +35,7 @@ public class Painter implements Runnable{
     public Painter(String name){
         this.id = UUID.randomUUID();
         this.name = name;
-        this.speed = random.nextInt(-500,500);
+        this.speed = random.nextInt(-200,200);
         this.bucket = new PaintBucket();
         painterList.add(this);
     }
@@ -43,7 +43,7 @@ public class Painter implements Runnable{
     public void work(){
         paintFencePart();
         try {
-            Thread.sleep(1000-speed);
+            Thread.sleep(1300-speed);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -85,6 +85,11 @@ public class Painter implements Runnable{
                 return;
             };
             System.out.println(fence.getPrettyString(2, name));
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
         bucket.takePaint(1);
         plankBeingPainted.setStatus(Status.Painted);
@@ -103,17 +108,19 @@ public class Painter implements Runnable{
             if (this.fencePartToPaint == null) {
                 this.fencePartToPaint = fence.findFencePartToWork();
                 //Thread.sleep(1);
-                if (this.fencePartToPaint == null) {
-                    System.out.println(name +" dupa");
-                } else {
+//                if (this.fencePartToPaint == null) {
+//                    System.out.println(name +" dupa");
+//                } else {
+//                    this.fencePartToPaint.setStatus(Status.InPainting);
+//                    System.out.println(name+" znalazłem: "+this.fencePartToPaint.getId());
+//                }
+                if (this.fencePartToPaint != null) {
                     this.fencePartToPaint.setStatus(Status.InPainting);
-                    System.out.println(name+" znalazłem: "+this.fencePartToPaint.getId());
                 }
             }
             work();
         } while (fence.getStatus()!=Status.Painted);
         Thread.currentThread().interrupt();
-        System.out.println(Thread.activeCount());
     }
 
     public void start () {

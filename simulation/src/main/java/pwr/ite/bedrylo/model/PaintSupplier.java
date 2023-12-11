@@ -22,8 +22,13 @@ public class PaintSupplier implements Runnable{
     }
     
     public void refillContainer(){
-        paintContainer.setPaintLeft(paintContainer.getCapacity());
+        paintContainer.refill();
         System.out.println(fence.getPrettyString(0, name));
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     @Override

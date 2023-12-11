@@ -65,7 +65,9 @@ public class Fence {
         return INSTANCE;
     }
     
-    public String getPrettyString(int action, String name){
+    public synchronized String getPrettyString(int action, String name){
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
         String temp = paintContainer.getPrettyString(action, name) + "\n";
         for (Painter painter: Painter.painterList) {
             temp += painter.getName() + " ";

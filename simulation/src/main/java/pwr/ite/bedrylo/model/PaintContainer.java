@@ -20,7 +20,7 @@ public class PaintContainer {
         return getPaintLeft() == 0;
     }
     
-    public void takePaint(PaintBucket bucket){
+    public synchronized void takePaint(PaintBucket bucket){
         if(!isEmpty()) {
             if (bucket.getCapacity() <= getPaintLeft()) {
                 bucket.setPaintLeft(bucket.getCapacity());
@@ -55,5 +55,8 @@ public class PaintContainer {
         }
         return INSTANCE;
     }
-    
+
+    public synchronized void refill() {
+        this.paintLeft = this.capacity;
+    }
 }

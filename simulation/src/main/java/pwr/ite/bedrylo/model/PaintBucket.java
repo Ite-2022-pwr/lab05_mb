@@ -24,7 +24,7 @@ public PaintBucket(){
     this.paintLeft = this.capacity;
 }
 
-public boolean refill(){
+public synchronized boolean refill(){
     if (!paintContainerAssigned.isEmpty()) {
     paintContainerAssigned.takePaint(this);
     return true;
