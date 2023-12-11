@@ -1,13 +1,15 @@
 package pwr.ite.bedrylo;
 
-import pwr.ite.bedrylo.model.*;
-import pwr.ite.bedrylo.model.enums.Status;
+import pwr.ite.bedrylo.model.Fence;
+import pwr.ite.bedrylo.model.PaintSupplier;
+import pwr.ite.bedrylo.model.Painter;
 
 public class Main {
+
     public static void main(String[] args) {
-        Fence.getInstance(16,32);
+        Fence.getInstance(16, 64);
         for (int i = 0; i < 25; i++) {
-            String name = "" + (char)(i + (int)'a');
+            String name = "" + (char) (i + (int) 'a');
             new Painter(name);
         }
         PaintSupplier paintSupplier = new PaintSupplier(10, "P");
@@ -16,11 +18,5 @@ public class Main {
             System.out.println(Painter.painterList.get(i).getName());
             Painter.painterList.get(i).start();
         }
-        
-        
-
-        
-
-        
     }
 }

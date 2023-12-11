@@ -4,24 +4,24 @@ import lombok.Data;
 import pwr.ite.bedrylo.model.enums.Status;
 
 @Data
-public class PaintSupplier implements Runnable{
-    
+public class PaintSupplier implements Runnable {
+
     private Thread thread;
-    
+
     private String name;
-    
+
     private int speed;
-    
+
     private Fence fence = Fence.getInstance();
-    
+
     private PaintContainer paintContainer = PaintContainer.getInstance();
-    
-    public PaintSupplier(int speed, String name){
+
+    public PaintSupplier(int speed, String name) {
         this.speed = speed;
         this.name = name;
     }
-    
-    public void refillContainer(){
+
+    public void refillContainer() {
         paintContainer.refill();
         System.out.println(fence.getPrettyString(0, name));
         try {
@@ -30,7 +30,7 @@ public class PaintSupplier implements Runnable{
             throw new RuntimeException(e);
         }
     }
-    
+
     @Override
     public void run() {
         while (fence.getStatus() != Status.Painted) {
@@ -45,11 +45,11 @@ public class PaintSupplier implements Runnable{
         }
     }
 
-    public void start () {
-        System.out.println("Starting " +  name );
+    public void start() {
+        System.out.println("Starting " + name);
         if (thread == null) {
-            thread = new Thread (this, name);
-            thread.start ();
+            thread = new Thread(this, name);
+            thread.start();
         }
     }
 }

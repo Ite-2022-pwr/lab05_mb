@@ -10,51 +10,51 @@ import java.util.Random;
 import java.util.UUID;
 
 @Data
-public class Painter implements Runnable{
-    
-    private Thread thread;
-    
-    private Fence fence = Fence.getInstance();
-    
+public class Painter implements Runnable {
+
     public static List<Painter> painterList = new ArrayList<>();
-    
     private final Random random = new Random();
-    
+    private Thread thread;
+    private Fence fence = Fence.getInstance();
     private UUID id;
-    
+
     private String name;
-    
+
     private int speed;
-    
+
     private PaintBucket bucket;
-    
+
     private Integer indexOfPlankToPaint;
-    
+
     private FencePart fencePartToPaint;
-    
-    public Painter(String name){
+
+    public Painter(String name) {
         this.id = UUID.randomUUID();
         this.name = name;
-        this.speed = random.nextInt(-200,200);
+        this.speed = random.nextInt(-100, 1000);
+        if (name.contains("a")) {
+            this.speed = 1200;
+        }
         this.bucket = new PaintBucket();
         painterList.add(this);
     }
-    
-    public void work(){
+
+    public void work() {
         paintFencePart();
         try {
-            Thread.sleep(1300-speed);
+            Thread.sleep(1300 - speed);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
-    
-    public void paintFencePart(){
+
+    public void paintFencePart() {
         if (fencePartToPaint == null) {
             return;
         }
         if (fencePartToPaint.getUnpaintedPlanks().isEmpty()) {
             this.fencePartToPaint.setStatus(Status.Painted);
+            this.fencePartToPaint.getPainters().remove(this);
             this.fencePartToPaint = null;
             indexOfPlankToPaint = null;
             return;
@@ -66,14 +66,25 @@ public class Painter implements Runnable{
             fencePartToPaint.getPainters().add(this);
             indexOfPlankToPaint = fencePartToPaint.getIndexOfMiddlePlankForPainting();
         }
-        if (indexOfPlankToPaint >= fencePartToPaint.getLength()) {
+        if (indexOfPlankToPaint == null || indexOfPlankToPaint >= fencePartToPaint.getLength()) {
+            this.fencePartToPaint.getPainters().remove(this);
+            this.fencePartToPaint = null;
+            indexOfPlankToPaint = null;
+            return;
+        }
+        if (fencePartToPaint.getPlankList().get(indexOfPlankToPaint) == null ||
+                fencePartToPaint.getPlankList().get(indexOfPlankToPaint).getStatus() == Status.Painted ||
+                fencePartToPaint.getPlankList().get(indexOfPlankToPaint).getStatus() == Status.InPainting) {
+            this.fencePartToPaint.getPainters().remove(this);
+            this.fencePartToPaint = null;
+            indexOfPlankToPaint = null;
             return;
         }
         paintPlank(fencePartToPaint.getPlankList().get(indexOfPlankToPaint));
         indexOfPlankToPaint++;
     }
-    
-    public void paintPlank(Plank plankBeingPainted){
+
+    public void paintPlank(Plank plankBeingPainted) {
         if (plankBeingPainted.getStatus() != Status.Unpainted) {
             fencePartToPaint = null;
             return;
@@ -83,7 +94,7 @@ public class Painter implements Runnable{
         if (bucket.isEmpty()) {
             if (!bucket.refill()) {
                 return;
-            };
+            }
             System.out.println(fence.getPrettyString(2, name));
             try {
                 Thread.sleep(100);
@@ -95,12 +106,12 @@ public class Painter implements Runnable{
         plankBeingPainted.setStatus(Status.Painted);
         System.out.println(fence.getPrettyString(1, name));
     }
-    
+
     @SneakyThrows
     @Override
-    public void run(){
+    public void run() {
         try {
-            Thread.sleep(random.nextInt(0,300));
+            Thread.sleep(random.nextInt(0, 300));
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -108,27 +119,27 @@ public class Painter implements Runnable{
             if (this.fencePartToPaint == null) {
                 this.fencePartToPaint = fence.findFencePartToWork();
                 //Thread.sleep(1);
-//                if (this.fencePartToPaint == null) {
-//                    System.out.println(name +" dupa");
-//                } else {
-//                    this.fencePartToPaint.setStatus(Status.InPainting);
-//                    System.out.println(name+" znalazłem: "+this.fencePartToPaint.getId());
-//                }
+                //                if (this.fencePartToPaint == null) {
+                //                    System.out.println(name +" dupa");
+                //                } else {
+                //                    this.fencePartToPaint.setStatus(Status.InPainting);
+                //                    System.out.println(name+" znalazłem: "+this.fencePartToPaint.getId());
+                //                }
                 if (this.fencePartToPaint != null) {
                     this.fencePartToPaint.setStatus(Status.InPainting);
                 }
             }
             work();
-        } while (fence.getStatus()!=Status.Painted);
+        } while (fence.getStatus() != Status.Painted);
+        System.out.println(Thread.currentThread().getName() + " now dying");
         Thread.currentThread().interrupt();
     }
 
-    public void start () {
-        System.out.println("Starting " +  name );
+    public void start() {
+        System.out.println("Starting " + name);
         if (thread == null) {
-            thread = new Thread (this, name);
-            thread.start ();
+            thread = new Thread(this, name);
+            thread.start();
         }
     }
-    
 }
