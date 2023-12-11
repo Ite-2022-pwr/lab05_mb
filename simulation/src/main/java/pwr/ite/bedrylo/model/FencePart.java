@@ -18,25 +18,27 @@ public class FencePart {
     
     private int length;
     
+    private List<Plank> longestUnpaintedSegment;
+    
     public List<Plank> getUnpaintedPlanks(){
         return plankList.stream().filter(plank -> plank.getStatus() == Status.Unpainted).toList();
     }
     
     public List<Plank> getLongestUnpaintedPlanksList(){
         ArrayList<Plank> temporaryPlankList = new ArrayList<>();
-        ArrayList<Plank> longestUnpaintedSegment = new ArrayList<>();
+        this.getLongestUnpaintedSegment().clear();
         for (Plank plank : plankList) {
             if (plank.getStatus() == Status.Unpainted) {
                 temporaryPlankList.add(plank);
             }else {
-                if(temporaryPlankList.toArray().length > longestUnpaintedSegment.toArray().length) {
-                    longestUnpaintedSegment = temporaryPlankList;
-                    temporaryPlankList.clear();
+                if(temporaryPlankList.toArray().length > this.getLongestUnpaintedSegment().toArray().length) {
+                    this.longestUnpaintedSegment = new ArrayList<>(temporaryPlankList);
                 }
+                temporaryPlankList.clear();
             }
         }
-        if (longestUnpaintedSegment.isEmpty()) {
-            longestUnpaintedSegment = temporaryPlankList;
+        if (this.getLongestUnpaintedSegment().isEmpty() || temporaryPlankList.toArray().length > getLongestUnpaintedSegment().toArray().length) {
+            this.longestUnpaintedSegment = new ArrayList<>(temporaryPlankList);
         }
         return longestUnpaintedSegment;
     }
@@ -52,6 +54,18 @@ public class FencePart {
         return unpaintedPlanks.get(middle);
     }
     
+    public String getPrettyString(){
+        String temp = "";
+        for (Plank plank: plankList) {
+            if (plank.getPainter() == null) {
+                temp += ".";
+            } else {
+                temp += plank.getPainter().getName();
+            }
+        }
+        return temp;
+    }
+    
     
     public FencePart(int length){
         this.id = UUID.randomUUID();
@@ -61,6 +75,7 @@ public class FencePart {
         for (int i = 0; i < getLength(); i++) {
             plankList.add(new Plank());
         }
+        this.longestUnpaintedSegment = new ArrayList<Plank>();
     }
     
 }

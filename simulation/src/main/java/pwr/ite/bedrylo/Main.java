@@ -10,8 +10,16 @@ public class Main {
         System.out.println(Painter.painterList);
         
         FencePart fencePart = new FencePart(16);
+        System.out.println(fencePart.getPrettyString());
         System.out.println(fencePart.getIndexOfStartOfLongestUnpaintedSegment());
         painter1.paintPlank(fencePart.getUnpaintedPlanks().get(3));
+        System.out.println(fencePart.getPrettyString());
+        System.out.println(fencePart.getIndexOfStartOfLongestUnpaintedSegment());
+        painter1.paintPlank(fencePart.getUnpaintedPlanks().get(8));
+        System.out.println(fencePart.getPrettyString());
+        System.out.println(fencePart.getIndexOfStartOfLongestUnpaintedSegment());
+        painter1.paintPlank(fencePart.getUnpaintedPlanks().get(11));
+        System.out.println(fencePart.getPrettyString());
         System.out.println(fencePart.getIndexOfStartOfLongestUnpaintedSegment());
         
     }
