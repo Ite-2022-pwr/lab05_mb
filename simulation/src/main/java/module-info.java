@@ -1,0 +1,3 @@
+module simulation {
+    requires lombok;
+}
