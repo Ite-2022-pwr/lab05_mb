@@ -54,7 +54,8 @@ public class Painter implements Runnable{
             return;
         }
         if (fencePartToPaint.getUnpaintedPlanks().isEmpty()) {
-            fencePartToPaint.setStatus(Status.Painted);
+            this.fencePartToPaint.setStatus(Status.Painted);
+            this.fencePartToPaint = null;
             indexOfPlankToPaint = null;
             return;
         }
@@ -99,14 +100,14 @@ public class Painter implements Runnable{
             throw new RuntimeException(e);
         }
         do {
-            if (fencePartToPaint == null) {
-                fencePartToPaint = fence.findFencePartToWork();
-                Thread.sleep(1);
-                if (fencePartToPaint == null) {
+            if (this.fencePartToPaint == null) {
+                this.fencePartToPaint = fence.findFencePartToWork();
+                //Thread.sleep(1);
+                if (this.fencePartToPaint == null) {
                     System.out.println(name +" dupa");
                 } else {
-                    fencePartToPaint.setStatus(Status.InPainting);
-                    //System.out.println(name+" znalazłem: "+fencePartToPaint.getId());
+                    this.fencePartToPaint.setStatus(Status.InPainting);
+                    System.out.println(name+" znalazłem: "+this.fencePartToPaint.getId());
                 }
             }
             work();
