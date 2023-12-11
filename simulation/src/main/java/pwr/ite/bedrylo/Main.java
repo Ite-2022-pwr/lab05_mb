@@ -5,22 +5,22 @@ import pwr.ite.bedrylo.model.enums.Status;
 
 public class Main {
     public static void main(String[] args) {
-        Painter painter1 = new Painter(10, "a");
-        Painter painter2 = new Painter(10, "b");
-        System.out.println(Painter.painterList);
+        Fence fence = Fence.getInstance(4,8);
+        for (int i = 0; i < 25; i++) {
+            String name = "" + (char)(i + (int)'a');
+            new Painter(name);
+        }
+        PaintSupplier paintSupplier = new PaintSupplier(10, "P");
+        paintSupplier.start();
+        for (int i = 0; i < 25; i++) {
+            System.out.println(Painter.painterList.get(i).getName());
+            Painter.painterList.get(i).start();
+        }
         
-        FencePart fencePart = new FencePart(16);
-        System.out.println(fencePart.getPrettyString());
-        System.out.println(fencePart.getIndexOfStartOfLongestUnpaintedSegment());
-        painter1.paintPlank(fencePart.getUnpaintedPlanks().get(3));
-        System.out.println(fencePart.getPrettyString());
-        System.out.println(fencePart.getIndexOfStartOfLongestUnpaintedSegment());
-        painter1.paintPlank(fencePart.getUnpaintedPlanks().get(8));
-        System.out.println(fencePart.getPrettyString());
-        System.out.println(fencePart.getIndexOfStartOfLongestUnpaintedSegment());
-        painter1.paintPlank(fencePart.getUnpaintedPlanks().get(11));
-        System.out.println(fencePart.getPrettyString());
-        System.out.println(fencePart.getIndexOfStartOfLongestUnpaintedSegment());
+        
+
+        
+
         
     }
 }

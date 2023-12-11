@@ -1,6 +1,7 @@
 package pwr.ite.bedrylo.model;
 
 import lombok.Data;
+import pwr.ite.bedrylo.misc.Utils;
 import pwr.ite.bedrylo.model.enums.Status;
 
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ public class FencePart {
     
     private List<Plank> longestUnpaintedSegment;
     
+    private List<Painter> painters;
+    
     public List<Plank> getUnpaintedPlanks(){
         return plankList.stream().filter(plank -> plank.getStatus() == Status.Unpainted).toList();
     }
@@ -31,13 +34,13 @@ public class FencePart {
             if (plank.getStatus() == Status.Unpainted) {
                 temporaryPlankList.add(plank);
             }else {
-                if(temporaryPlankList.toArray().length > this.getLongestUnpaintedSegment().toArray().length) {
+                if(Utils.getListLength(temporaryPlankList) > Utils.getListLength(this.getLongestUnpaintedSegment())) {
                     this.longestUnpaintedSegment = new ArrayList<>(temporaryPlankList);
                 }
                 temporaryPlankList.clear();
             }
         }
-        if (this.getLongestUnpaintedSegment().isEmpty() || temporaryPlankList.toArray().length > getLongestUnpaintedSegment().toArray().length) {
+        if (this.getLongestUnpaintedSegment().isEmpty() || Utils.getListLength(temporaryPlankList) > Utils.getListLength(this.getLongestUnpaintedSegment())) {
             this.longestUnpaintedSegment = new ArrayList<>(temporaryPlankList);
         }
         return longestUnpaintedSegment;
@@ -48,10 +51,12 @@ public class FencePart {
     }
     
     public Plank getMiddlePlankForPainting(){
-        List<Plank> unpaintedPlanks = getUnpaintedPlanks();
-        int middle = unpaintedPlanks.toArray().length/2;
-        System.out.println(middle);
-        return unpaintedPlanks.get(middle);
+        int indexOfPlankToPaintInLongestUnpainted = Utils.getListLength(getLongestUnpaintedPlanksList())/2;
+        return longestUnpaintedSegment.get(indexOfPlankToPaintInLongestUnpainted);
+    }
+    
+    public int getIndexOfMiddlePlankForPainting(){
+        return plankList.indexOf(getMiddlePlankForPainting());
     }
     
     public String getPrettyString(){
@@ -71,6 +76,7 @@ public class FencePart {
         this.id = UUID.randomUUID();
         this.length = length;
         this.status = Status.Unpainted;
+        this.painters = new ArrayList<>();
         this.plankList = new ArrayList<>(getLength());
         for (int i = 0; i < getLength(); i++) {
             plankList.add(new Plank());

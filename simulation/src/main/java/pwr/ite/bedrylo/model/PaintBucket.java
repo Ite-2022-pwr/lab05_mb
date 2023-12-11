@@ -21,13 +21,15 @@ private final Random random = new Random();
 public PaintBucket(){
     this.id = UUID.randomUUID();
     this.capacity = random.nextInt(3,8);
-    this.paintLeft = 0;
+    this.paintLeft = this.capacity;
 }
 
-public void refill(){
+public boolean refill(){
     if (!paintContainerAssigned.isEmpty()) {
     paintContainerAssigned.takePaint(this);
+    return true;
     }
+    return false;
 }
 
 public void takePaint(int amount){

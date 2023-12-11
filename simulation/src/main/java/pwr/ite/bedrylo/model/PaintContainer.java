@@ -29,7 +29,17 @@ public class PaintContainer {
                 bucket.setPaintLeft(getPaintLeft());
                 setPaintLeft(0);
             }
+            
         }
+    }
+
+    public String getPrettyString(int action, String nameOfCaller){
+        return switch (action) {
+            case 0 -> nameOfCaller + "[" + paintLeft + "].";
+            case 1 -> ".[" + paintLeft + "].";
+            case 2 -> ".[" + paintLeft + "]" + nameOfCaller;
+            default -> ".[" + paintLeft + "].";
+        };
     }
     
     public static PaintContainer getInstance(){
