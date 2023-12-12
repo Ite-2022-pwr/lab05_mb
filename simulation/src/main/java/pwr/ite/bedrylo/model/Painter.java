@@ -93,6 +93,8 @@ public class Painter implements Runnable {
         plankBeingPainted.setStatus(Status.InPainting);
         if (bucket.isEmpty()) {
             if (!bucket.refill()) {
+                plankBeingPainted.setStatus(Status.Unpainted);
+                plankBeingPainted.setPainter(null);
                 return;
             }
             System.out.println(fence.getPrettyString(2, name));
