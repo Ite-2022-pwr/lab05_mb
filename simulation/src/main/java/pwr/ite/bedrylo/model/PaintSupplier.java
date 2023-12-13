@@ -8,7 +8,7 @@ public class PaintSupplier implements Runnable {
 
     private Thread thread;
 
-    private String name;
+    private String name = "PS";
 
     private int speed;
 
@@ -16,26 +16,27 @@ public class PaintSupplier implements Runnable {
 
     private PaintContainer paintContainer = PaintContainer.getInstance();
 
-    public PaintSupplier(int speed, String name) {
+    public PaintSupplier(int speed) {
         this.speed = speed;
-        this.name = name;
     }
 
     public void refillContainer() {
-        paintContainer.refill();
-        System.out.println(fence.getPrettyString(0, name));
+        paintContainer.setRefilling(true);
+        System.out.println(fence.getPrettyString());
         try {
-            Thread.sleep(200);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        paintContainer.refill();
+        paintContainer.setRefilling(false);
     }
 
     @Override
     public void run() {
         while (fence.getStatus() != Status.Painted) {
             try {
-                Thread.sleep(100 - getSpeed());
+                Thread.sleep(1000 - getSpeed());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

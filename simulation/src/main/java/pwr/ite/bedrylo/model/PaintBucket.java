@@ -1,25 +1,22 @@
 package pwr.ite.bedrylo.model;
 
+import lombok.Data;
+
 import java.util.Random;
 import java.util.UUID;
-import lombok.Data;
 
 @Data
 public class PaintBucket {
 
-    private UUID id;
-
-    private int capacity;
-
-    private int paintLeft;
-
-    private PaintContainer paintContainerAssigned = PaintContainer.getInstance();
-
     private final Random random = new Random();
+    private UUID id;
+    private int capacity;
+    private int paintLeft;
+    private PaintContainer paintContainerAssigned = PaintContainer.getInstance();
 
     public PaintBucket() {
         this.id = UUID.randomUUID();
-        this.capacity = random.nextInt(3, 8);
+        this.capacity = random.nextInt(8, 16);
         this.paintLeft = this.capacity;
     }
 

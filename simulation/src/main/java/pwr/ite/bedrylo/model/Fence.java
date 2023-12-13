@@ -1,11 +1,12 @@
 package pwr.ite.bedrylo.model;
 
+import lombok.Data;
+import pwr.ite.bedrylo.model.enums.Status;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import lombok.Data;
-import pwr.ite.bedrylo.model.enums.Status;
 
 @Data
 public class Fence {
@@ -32,25 +33,6 @@ public class Fence {
         }
     }
 
-    public FencePart findFencePartByStatus(Status status) {
-        return fencePartList
-            .stream()
-            .filter(fencePart -> fencePart.getStatus() == status)
-            .max(Comparator.comparing(o -> o.getUnpaintedPlanks().size()))
-            .orElse(null);
-    }
-
-    public FencePart findFencePartToWork() {
-        FencePart fencePartToWork = findFencePartByStatus(Status.Unpainted);
-        if (fencePartToWork == null) {
-            fencePartToWork = findFencePartByStatus(Status.InPainting);
-        }
-        if (fencePartToWork == null) {
-            status = Status.Painted;
-        }
-        return fencePartToWork;
-    }
-
     public static Fence getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new Fence(16, 32);
@@ -65,10 +47,29 @@ public class Fence {
         return INSTANCE;
     }
 
-    public synchronized String getPrettyString(int action, String name) {
+    public FencePart findFencePartByStatus(Status status) {
+        return fencePartList
+                .stream()
+                .filter(fencePart -> fencePart.getStatus() == status)
+                .max(Comparator.comparing(o -> o.getUnpaintedPlanks().size()))
+                .orElse(null);
+    }
+
+    public FencePart findFencePartToWork() {
+        FencePart fencePartToWork = findFencePartByStatus(Status.Unpainted);
+        if (fencePartToWork == null) {
+            fencePartToWork = findFencePartByStatus(Status.InPainting);
+        }
+        if (fencePartToWork == null) {
+            status = Status.Painted;
+        }
+        return fencePartToWork;
+    }
+
+    public synchronized String getPrettyString() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
-        String temp = paintContainer.getPrettyString(action, name) + "\n";
+        String temp = paintContainer.getPrettyString() + "\n";
         for (Painter painter : Painter.painterList) {
             temp += painter.getName() + " ";
         }

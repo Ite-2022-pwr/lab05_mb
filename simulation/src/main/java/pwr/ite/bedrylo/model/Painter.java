@@ -31,9 +31,9 @@ public class Painter implements Runnable {
     public Painter(String name) {
         this.id = UUID.randomUUID();
         this.name = name;
-        this.speed = random.nextInt(-100, 1000);
+        this.speed = random.nextInt(-100, 500);
         if (name.contains("a")) {
-            this.speed = 1200;
+            this.speed = 550;
         }
         this.bucket = new PaintBucket();
         painterList.add(this);
@@ -42,7 +42,7 @@ public class Painter implements Runnable {
     public void work() {
         paintFencePart();
         try {
-            Thread.sleep(1300 - speed);
+            Thread.sleep(600 - speed);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -92,12 +92,27 @@ public class Painter implements Runnable {
         plankBeingPainted.setPainter(this);
         plankBeingPainted.setStatus(Status.InPainting);
         if (bucket.isEmpty()) {
+            if (fence.getPaintContainer().getPainterUsing() != null) {
+                plankBeingPainted.setStatus(Status.Unpainted);
+                plankBeingPainted.setPainter(null);
+                indexOfPlankToPaint--;
+                return;
+            }
+            fence.getPaintContainer().setPainterUsing(this);
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             if (!bucket.refill()) {
                 plankBeingPainted.setStatus(Status.Unpainted);
                 plankBeingPainted.setPainter(null);
+                indexOfPlankToPaint--;
+                fence.getPaintContainer().setPainterUsing(null);
                 return;
             }
-            System.out.println(fence.getPrettyString(2, name));
+            fence.getPaintContainer().setPainterUsing(null);
+            System.out.println(fence.getPrettyString());
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -106,7 +121,7 @@ public class Painter implements Runnable {
         }
         bucket.takePaint(1);
         plankBeingPainted.setStatus(Status.Painted);
-        System.out.println(fence.getPrettyString(1, name));
+        System.out.println(fence.getPrettyString());
     }
 
     @SneakyThrows
