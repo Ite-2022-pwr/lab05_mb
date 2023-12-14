@@ -3,10 +3,7 @@ package pwr.ite.bedrylo.model;
 import lombok.Data;
 import pwr.ite.bedrylo.model.enums.Status;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 public class Fence {
@@ -27,7 +24,8 @@ public class Fence {
         this.id = UUID.randomUUID();
         this.length = fenceLength;
         this.status = Status.Unpainted;
-        this.fencePartList = new ArrayList<FencePart>(length);
+//        this.fencePartList = new ArrayList<FencePart>(length);
+        this.fencePartList = Collections.synchronizedList(new ArrayList<>());
         for (int i = 0; i < fenceLength; i++) {
             this.fencePartList.add(new FencePart(fencePartLength));
         }
@@ -47,7 +45,7 @@ public class Fence {
         return INSTANCE;
     }
 
-    public FencePart findFencePartByStatus(Status status) {
+    public synchronized FencePart findFencePartByStatus(Status status) {
         return fencePartList
                 .stream()
                 .filter(fencePart -> fencePart.getStatus() == status)
@@ -55,7 +53,7 @@ public class Fence {
                 .orElse(null);
     }
 
-    public FencePart findFencePartToWork() {
+    public synchronized FencePart findFencePartToWork() {
         FencePart fencePartToWork = findFencePartByStatus(Status.Unpainted);
         if (fencePartToWork == null) {
             fencePartToWork = findFencePartByStatus(Status.InPainting);

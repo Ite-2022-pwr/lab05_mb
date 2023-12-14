@@ -32,9 +32,6 @@ public class Painter implements Runnable {
         this.id = UUID.randomUUID();
         this.name = name;
         this.speed = random.nextInt(-100, 500);
-        if (name.contains("a")) {
-            this.speed = 550;
-        }
         this.bucket = new PaintBucket();
         painterList.add(this);
     }

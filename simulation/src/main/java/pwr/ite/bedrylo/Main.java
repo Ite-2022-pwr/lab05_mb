@@ -7,8 +7,8 @@ import pwr.ite.bedrylo.model.Painter;
 public class Main {
 
     public static void main(String[] args) {
-        Fence.getInstance(64, 64);
-        for (int i = 0; i < 25; i++) {
+        Fence.getInstance(8, 24);
+        for (int i = 0; i < 10; i++) {
             String name = "" + (char) (i + (int) 'a');
             new Painter(name);
         }
