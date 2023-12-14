@@ -60,6 +60,7 @@ public class Fence {
         }
         if (fencePartToWork == null) {
             status = Status.Painted;
+            paintContainer.callForPaint();
         }
         return fencePartToWork;
     }

@@ -25,6 +25,7 @@ public class PaintBucket {
             paintContainerAssigned.takePaint(this);
             return true;
         }
+        paintContainerAssigned.callForPaint();
         return false;
     }
 

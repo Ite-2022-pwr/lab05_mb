@@ -15,6 +15,8 @@ public class PaintContainer {
 
     private volatile Painter painterUsing;
 
+    private volatile PaintSupplier paintSupplier;
+
     public PaintContainer(int capacity) {
         this.capacity = capacity;
         this.paintLeft = capacity;
@@ -65,6 +67,12 @@ public class PaintContainer {
             temp += ".";
         }
         return temp;
+    }
+
+    public synchronized void callForPaint() {
+        synchronized (paintSupplier) {
+            paintSupplier.notify();
+        }
     }
 
     public synchronized void refill() {

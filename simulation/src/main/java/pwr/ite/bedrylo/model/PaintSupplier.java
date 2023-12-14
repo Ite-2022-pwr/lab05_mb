@@ -1,6 +1,7 @@
 package pwr.ite.bedrylo.model;
 
 import lombok.Data;
+import lombok.SneakyThrows;
 import pwr.ite.bedrylo.model.enums.Status;
 
 @Data
@@ -32,16 +33,17 @@ public class PaintSupplier implements Runnable {
         paintContainer.setRefilling(false);
     }
 
+
+    @SneakyThrows
     @Override
     public void run() {
         while (fence.getStatus() != Status.Painted) {
-            try {
-                Thread.sleep(1000 - getSpeed());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            synchronized (this) {
+                this.wait();
             }
-            if (paintContainer.isEmpty()) {
-                refillContainer();
+            refillContainer();
+            if (fence.getStatus() == Status.Painted) {
+            Thread.currentThread().interrupt();
             }
         }
     }
