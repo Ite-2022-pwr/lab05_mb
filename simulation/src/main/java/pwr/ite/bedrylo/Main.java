@@ -8,12 +8,12 @@ import pwr.ite.bedrylo.model.Painter;
 public class Main {
 
   public static void main(String[] args) {
-    Fence.getInstance(16, 48);
+    Fence.getInstance(2, 10);
     PaintContainer paintContainer = PaintContainer.getInstance();
 
-    for (int i = 0; i < 25; i++) {
+    for (int i = 0; i < 3; i++) {
       String name = "" + (char) (i + (int) 'a');
-      new Painter(name);
+      new Painter(name, 1);
     }
     PaintSupplier paintSupplier = new PaintSupplier(10);
     paintContainer.setPaintSupplier(paintSupplier);

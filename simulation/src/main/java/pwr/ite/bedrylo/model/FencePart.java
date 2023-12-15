@@ -18,7 +18,7 @@ public class FencePart {
 
   private int length;
 
-  private List<Plank> longestUnpaintedSegment;
+  private volatile List<Plank> longestUnpaintedSegment;
 
   private List<Painter> painters;
 
@@ -28,43 +28,64 @@ public class FencePart {
     this.status = Status.Unpainted;
     this.painters = Collections.synchronizedList(new ArrayList<>());
     this.plankList = Collections.synchronizedList(new ArrayList<>());
+    this.longestUnpaintedSegment = Collections.synchronizedList(new ArrayList<>());
     for (int i = 0; i < getLength(); i++) {
       plankList.add(new Plank());
     }
     this.longestUnpaintedSegment = new ArrayList<Plank>();
   }
 
+  public synchronized void addPainter(Painter painter) {
+    painters.add(painter);
+  }
+
+  public synchronized List<Painter> getPainters() {
+    return painters;
+  }
+
   public synchronized List<Plank> getUnpaintedPlanks() {
-    return plankList.stream().filter(plank -> plank.getStatus() == Status.Unpainted).toList();
+    return plankList.stream().filter(plank -> Status.Unpainted.equals(plank.getStatus())).toList();
   }
 
   public synchronized List<Plank> getLongestUnpaintedPlanksList() {
     ArrayList<Plank> temporaryPlankList = new ArrayList<>();
-    this.getLongestUnpaintedSegment().clear();
     for (Plank plank : plankList) {
-      if (plank.getStatus() == Status.Unpainted) {
+      if (plank.getStatus().equals(Status.Unpainted)) {
         temporaryPlankList.add(plank);
       } else {
-        if (temporaryPlankList.size() > getLongestUnpaintedSegment().size()) {
-          this.longestUnpaintedSegment = new ArrayList<>(temporaryPlankList);
+        if (temporaryPlankList.size() > longestUnpaintedSegment.size()) {
+          longestUnpaintedSegment.clear();
+          longestUnpaintedSegment.addAll(temporaryPlankList);
         }
         temporaryPlankList.clear();
       }
     }
-    if (this.getLongestUnpaintedSegment().isEmpty()
-        || temporaryPlankList.size() > getLongestUnpaintedSegment().size()) {
-      this.longestUnpaintedSegment = new ArrayList<>(temporaryPlankList);
+    if (longestUnpaintedSegment.isEmpty()
+        || temporaryPlankList.size() > longestUnpaintedSegment.size()) {
+      longestUnpaintedSegment = new ArrayList<>(temporaryPlankList);
     }
     return longestUnpaintedSegment;
   }
 
-  public int getIndexOfStartOfLongestUnpaintedSegment() {
-    return plankList.indexOf(getLongestUnpaintedPlanksList().get(0));
-  }
-
-  public Plank getMiddlePlankForPainting() {
+  public synchronized Plank getMiddlePlankForPainting() {
     int indexOfPlankToPaintInLongestUnpainted = getLongestUnpaintedPlanksList().size() / 2;
     return longestUnpaintedSegment.get(indexOfPlankToPaintInLongestUnpainted);
+  }
+
+  public synchronized boolean paintPlank(Plank plank, Painter painter) {
+    if (!plank.getStatus().equals(Status.Unpainted)) {
+      return false;
+    }
+    try {
+      plank.setPainter(painter);
+      plank.setStatus(Status.InPainting);
+      painter.getThread().sleep(200);
+      plank.setStatus(Status.Painted);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
+    }
+    return true;
   }
 
   public int getIndexOfMiddlePlankForPainting() {
@@ -72,14 +93,14 @@ public class FencePart {
   }
 
   public synchronized String getPrettyString() {
-    String temp = "";
+    StringBuilder temp = new StringBuilder();
     for (Plank plank : plankList) {
       if (plank.getPainter() == null) {
-        temp += ".";
+        temp.append(".");
       } else {
-        temp += plank.getPainter().getName();
+        temp.append(plank.getPainter().getName());
       }
     }
-    return temp;
+    return temp.toString();
   }
 }

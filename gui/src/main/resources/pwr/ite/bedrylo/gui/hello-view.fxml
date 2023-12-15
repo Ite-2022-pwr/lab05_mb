@@ -1,15 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml" alignment="CENTER" spacing="20.0"
-      fx:controller="pwr.ite.bedrylo.gui.controller.MainController">
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" prefHeight="354.0" prefWidth="723.0" spacing="20.0"
+      xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="pwr.ite.bedrylo.gui.controller.MainController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
-
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
+    <children>
+        <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+            <children>
+                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Ile pracowników"/>
+                        <Spinner fx:id="painterCountSpinner"/>
+                        <Label text="1-25"/>
+                    </children>
+                </VBox>
+                <VBox alignment="CENTER" prefHeight="100.0" prefWidth="104.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label prefHeight="17.0" prefWidth="102.0" text="mnożnik prędkości"/>
+                        <Spinner fx:id="speedMultiplierSpinner"/>
+                        <Label text="0.1-10"/>
+                    </children>
+                </VBox>
+                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Ile segmentów"/>
+                        <Spinner fx:id="fenceSegmentCountSpinner"/>
+                        <Label text="1-10"/>
+                    </children>
+                </VBox>
+                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="ile desek na segment"/>
+                        <Spinner fx:id="fenceFragmentPlankCountSpinner"/>
+                        <Label text="1-20"/>
+                    </children>
+                </VBox>
+                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="ile farby w wspólnym zbiorniku"/>
+                        <Spinner fx:id="paintContainerCapacitySpinner"/>
+                        <Label text="1-500"/>
+                    </children>
+                </VBox>
+                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Uruchom"/>
+                        <Button fx:id="startButton" mnemonicParsing="false" onMouseClicked="#onStartButtonClick"
+                                text="START"/>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+        <TextArea fx:id="simulationField" editable="false" wrapText="true">
+            <font>
+                <Font size="18.0"/>
+            </font>
+        </TextArea>
+    </children>
 </VBox>

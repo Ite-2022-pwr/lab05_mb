@@ -1,56 +1,62 @@
 package pwr.ite.bedrylo.model;
 
 import lombok.Data;
-import lombok.SneakyThrows;
 import pwr.ite.bedrylo.model.enums.Status;
 
 @Data
 public class PaintSupplier implements Runnable {
 
-  private Thread thread;
+  private static Thread thread;
 
   private String name = "PS";
 
-  private int speed;
+  private double speed;
 
   private Fence fence = Fence.getInstance();
 
   private PaintContainer paintContainer = PaintContainer.getInstance();
 
-  public PaintSupplier(int speed) {
+  public PaintSupplier(double speed) {
     this.speed = speed;
   }
 
+  public static Thread getThread() {
+    return thread;
+  }
+
   public void refillContainer() {
-    paintContainer.setRefilling(true);
-    System.out.println(fence.getPrettyString());
     try {
-      Thread.sleep(2000);
+      paintContainer.setRefilling(true);
+      System.out.println(fence.getPrettyString());
+      Thread.sleep((int) (1000 * speed));
+      paintContainer.refill();
+      paintContainer.setRefilling(false);
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
-    paintContainer.refill();
-    paintContainer.setRefilling(false);
   }
 
-  @SneakyThrows
   @Override
   public void run() {
     while (fence.getStatus() != Status.Painted) {
-      synchronized (this) {
-        this.wait();
-      }
-      refillContainer();
-      if (fence.getStatus() == Status.Painted) {
-        Thread.currentThread().interrupt();
+      try {
+        synchronized (this) {
+          this.wait();
+          refillContainer();
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
       }
     }
+    System.out.println(name + " now dying");
+    Thread.currentThread().interrupt();
   }
 
   public void start() {
     System.out.println("Starting " + name);
     if (thread == null) {
       thread = new Thread(this, name);
+      thread.setDaemon(true);
       thread.start();
     }
   }

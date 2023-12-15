@@ -3,9 +3,7 @@ package pwr.ite.bedrylo.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import lombok.Data;
-import lombok.SneakyThrows;
 import pwr.ite.bedrylo.model.enums.Status;
 
 @Data
@@ -13,17 +11,17 @@ public class Painter implements Runnable {
 
   public static List<Painter> painterList = new ArrayList<>();
 
+  private static Fence fence = Fence.getInstance();
+
   private final Random random = new Random();
 
   private Thread thread;
 
-  private Fence fence = Fence.getInstance();
-
-  private UUID id;
-
   private String name;
 
-  private int speed;
+  private double speed;
+
+  private double speedMultiplier;
 
   private PaintBucket bucket;
 
@@ -31,18 +29,18 @@ public class Painter implements Runnable {
 
   private FencePart fencePartToPaint;
 
-  public Painter(String name) {
-    this.id = UUID.randomUUID();
+  public Painter(String name, double speedMultiplier) {
     this.name = name;
-    this.speed = random.nextInt(-100, 500);
+    this.speedMultiplier = speedMultiplier;
+    this.speed = random.nextInt(100, 1000);
     this.bucket = new PaintBucket();
     painterList.add(this);
   }
 
   public void work() {
-    paintFencePart();
     try {
-      Thread.sleep(600 - speed);
+      paintFencePart();
+      Thread.sleep((int) (speed * speedMultiplier));
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
@@ -53,96 +51,79 @@ public class Painter implements Runnable {
       return;
     }
     if (fencePartToPaint.getUnpaintedPlanks().isEmpty()) {
-      this.fencePartToPaint.setStatus(Status.Painted);
-      this.fencePartToPaint.getPainters().remove(this);
-      this.fencePartToPaint = null;
+      fencePartToPaint.setStatus(Status.Painted);
+      fencePartToPaint.getPainters().remove(this);
+      fencePartToPaint = null;
       indexOfPlankToPaint = null;
       return;
-    }
-    if (fencePartToPaint.getPainters().isEmpty()) {
-      fencePartToPaint.getPainters().add(this);
+    } else if (fencePartToPaint.getPainters().isEmpty()) {
+      fencePartToPaint.addPainter(this);
       indexOfPlankToPaint = 0;
     } else if (!fencePartToPaint.getPainters().contains(this)) {
-      fencePartToPaint.getPainters().add(this);
+      fencePartToPaint.addPainter(this);
       indexOfPlankToPaint = fencePartToPaint.getIndexOfMiddlePlankForPainting();
     }
-    if (indexOfPlankToPaint == null || indexOfPlankToPaint >= fencePartToPaint.getLength()) {
-      this.fencePartToPaint.getPainters().remove(this);
-      this.fencePartToPaint = null;
+    if (indexOfPlankToPaint >= fencePartToPaint.getLength()) {
+      fencePartToPaint.getPainters().remove(this);
+      fencePartToPaint = null;
       indexOfPlankToPaint = null;
       return;
     }
-    if (fencePartToPaint.getPlankList().get(indexOfPlankToPaint) == null
-        || fencePartToPaint.getPlankList().get(indexOfPlankToPaint).getStatus() == Status.Painted
-        || fencePartToPaint.getPlankList().get(indexOfPlankToPaint).getStatus()
-            == Status.InPainting) {
-      this.fencePartToPaint.getPainters().remove(this);
-      this.fencePartToPaint = null;
+    Plank plankToTryPainting = fencePartToPaint.getPlankList().get(indexOfPlankToPaint);
+    if (!plankToTryPainting.getStatus().equals(Status.Unpainted)) {
+      fencePartToPaint.getPainters().remove(this);
+      fencePartToPaint = null;
       indexOfPlankToPaint = null;
       return;
     }
-    paintPlank(fencePartToPaint.getPlankList().get(indexOfPlankToPaint));
-    indexOfPlankToPaint++;
+    paint(plankToTryPainting);
   }
 
-  public void paintPlank(Plank plankBeingPainted) {
-    if (plankBeingPainted.getStatus() != Status.Unpainted) {
+  public void paint(Plank plankBeingPainted) {
+    if (!plankBeingPainted.getStatus().equals(Status.Unpainted)) {
+      fencePartToPaint.getPainters().remove(this);
       fencePartToPaint = null;
+      indexOfPlankToPaint = null; // wjebać te 3 w funkcje
       return;
     }
-    plankBeingPainted.setPainter(this);
-    plankBeingPainted.setStatus(Status.InPainting);
     if (bucket.isEmpty()) {
       if (fence.getPaintContainer().getPainterUsing() != null) {
-        plankBeingPainted.setStatus(Status.Unpainted);
-        plankBeingPainted.setPainter(null);
-        indexOfPlankToPaint--;
         return;
       }
       fence.getPaintContainer().setPainterUsing(this);
       try {
-        Thread.sleep(300);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
-      if (!bucket.refill()) {
-        plankBeingPainted.setStatus(Status.Unpainted);
-        plankBeingPainted.setPainter(null);
-        indexOfPlankToPaint--;
+        Thread.sleep((int) (speed * speedMultiplier));
         fence.getPaintContainer().setPainterUsing(null);
-        return;
-      }
-      fence.getPaintContainer().setPainterUsing(null);
-      System.out.println(fence.getPrettyString());
-      try {
-        Thread.sleep(100);
+        if (!bucket.refill()) return;
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
     }
-    bucket.takePaint(1);
-    plankBeingPainted.setStatus(Status.Painted);
+    System.out.println(fence.getPrettyString());
+    try {
+      Thread.sleep((int) (speed * speedMultiplier));
+      if (fencePartToPaint.paintPlank(plankBeingPainted, this)) {
+        bucket.takePaint(1);
+        indexOfPlankToPaint++;
+      } else {
+        return;
+      }
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
     System.out.println(fence.getPrettyString());
   }
 
-  @SneakyThrows
   @Override
   public void run() {
     try {
-      Thread.sleep(random.nextInt(0, 300));
+      Thread.sleep((int) (speed * speedMultiplier));
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
     do {
       if (this.fencePartToPaint == null) {
         this.fencePartToPaint = fence.findFencePartToWork();
-        // Thread.sleep(1);
-        //                if (this.fencePartToPaint == null) {
-        //                    System.out.println(name +" dupa");
-        //                } else {
-        //                    this.fencePartToPaint.setStatus(Status.InPainting);
-        //                    System.out.println(name+" znalazłem: "+this.fencePartToPaint.getId());
-        //                }
         if (this.fencePartToPaint != null) {
           this.fencePartToPaint.setStatus(Status.InPainting);
         }
@@ -157,6 +138,7 @@ public class Painter implements Runnable {
     System.out.println("Starting " + name);
     if (thread == null) {
       thread = new Thread(this, name);
+      thread.setDaemon(true);
       thread.start();
     }
   }

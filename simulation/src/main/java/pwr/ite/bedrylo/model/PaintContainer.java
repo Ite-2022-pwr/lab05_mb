@@ -37,18 +37,26 @@ public class PaintContainer {
     return INSTANCE;
   }
 
+  public void setCapacity(int capacity) {
+    this.capacity = capacity;
+    this.paintLeft = capacity;
+  }
+
   public boolean isEmpty() {
-    return getPaintLeft() == 0;
+    return paintLeft == 0;
   }
 
   public synchronized void takePaint(PaintBucket bucket) {
+    if (refilling) {
+      return;
+    }
     if (!isEmpty()) {
-      if (bucket.getCapacity() <= getPaintLeft()) {
+      if (bucket.getCapacity() <= paintLeft) {
         bucket.setPaintLeft(bucket.getCapacity());
-        setPaintLeft(getPaintLeft() - bucket.getCapacity());
+        paintLeft = paintLeft - bucket.getCapacity();
       } else {
-        bucket.setPaintLeft(getPaintLeft());
-        setPaintLeft(0);
+        bucket.setPaintLeft(paintLeft);
+        paintLeft = 0;
       }
     }
   }
@@ -69,13 +77,13 @@ public class PaintContainer {
     return temp;
   }
 
-  public synchronized void callForPaint() {
+  public synchronized void callForPaintSupplier() {
     synchronized (paintSupplier) {
       paintSupplier.notify();
     }
   }
 
-  public synchronized void refill() {
+  public void refill() {
     this.paintLeft = this.capacity;
   }
 }

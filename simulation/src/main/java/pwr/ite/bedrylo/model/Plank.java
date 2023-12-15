@@ -1,8 +1,9 @@
 package pwr.ite.bedrylo.model;
 
-import java.util.UUID;
 import lombok.Data;
 import pwr.ite.bedrylo.model.enums.Status;
+
+import java.util.UUID;
 
 @Data
 public class Plank {
