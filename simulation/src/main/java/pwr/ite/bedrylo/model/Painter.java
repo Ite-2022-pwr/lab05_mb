@@ -134,11 +134,13 @@ public class Painter implements Runnable {
     Thread.currentThread().interrupt();
   }
 
-  public void start() {
+  public void start(boolean runFromConsole) {
     System.out.println("Starting " + name);
     if (thread == null) {
       thread = new Thread(this, name);
-      thread.setDaemon(true);
+      if (!runFromConsole) {
+        thread.setDaemon(true);
+      }
       thread.start();
     }
   }

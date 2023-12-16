@@ -24,7 +24,7 @@ public class Main {
     //        }
     for (Painter painter : Painter.painterList) {
       System.out.println(painter.getName() + " Starting");
-      painter.start();
+      painter.start(true);
     }
   }
 }
